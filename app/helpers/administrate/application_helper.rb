@@ -38,6 +38,11 @@ module Administrate
       "#{resource_name.to_s.singularize}_dashboard".classify.constantize
     end
 
+    def model_from_resource(resource_name)
+      dashboard = dashboard_from_resource(resource_name)
+      dashboard.try(:model) || resource_name.to_sym
+    end
+
     def display_resource_name(resource_name)
       dashboard_from_resource(resource_name).resource_name(
         count: PLURAL_MANY_COUNT,
@@ -65,11 +70,11 @@ module Administrate
       association_params = collection_names.map do |assoc_name|
         { assoc_name => %i[order direction page per_page] }
       end
-      params.permit(:search, :id, :page, :per_page, association_params)
+      params.permit(:search, :id, :_page, :per_page, association_params)
     end
 
     def clear_search_params
-      params.except(:search, :page).permit(
+      params.except(:search, :_page).permit(
         :per_page, resource_name => %i[order direction]
       )
     end
